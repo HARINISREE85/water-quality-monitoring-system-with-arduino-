@@ -1,0 +1,27 @@
+import serial
+import time
+
+# Connect to Arduino serial port
+arduino = serial.Serial('COM3', 9600, timeout=1)  # Replace 'COM3' with your port
+time.sleep(2)  # Wait for connection to establish
+
+def read_data():
+    try:
+        arduino.write(b'')  # Optional: wake serial
+        line = arduino.readline().decode('utf-8').strip()
+        if line:
+            parts = line.split(',')
+            if len(parts) == 3:
+                pH = float(parts[0])
+                temperature = float(parts[1])
+                turbidity = float(parts[2])
+                return pH, temperature, turbidity
+    except Exception as e:
+        print("Error reading data:", e)
+    return None, None, None
+
+while True:
+    pH, temperature, turbidity = read_data()
+    if pH is not None:
+        print(f"pH: {pH:.2f}, Temp: {temperature:.2f}°C, Turbidity: {turbidity}")
+    time.sleep(2)
